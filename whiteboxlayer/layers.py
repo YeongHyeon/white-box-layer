@@ -287,7 +287,24 @@ class Layers(object):
         if(verbose): print("Readout (%s)" %(name), x.shape, "->", y.shape)
         return self.activation(x=y, activation=activation, name=name)
 
-    def node_edge_average(self, node, edge, hood, c_out, \
+    def pipgcn_node_average(self, node, c_out, \
+        batch_norm=False, activation=None, name='', verbose=True):
+
+        node_in, c_out = node.get_shape().as_list()[-1], int(c_out)
+
+        w_node_c = self.__get_variable(shape=[node_in, c_out], \
+            trainable=True, name='%s_w_node_c' %(name))
+        b = self.__get_variable(shape=[c_out], \
+            trainable=True, name='%s_b' %(name))
+
+        """ -=-=-= Term 1: node aggregation =-=-=- """
+        term1 = tf.linalg.matmul(node, w_node_c, name='%s_term1' %(name)) # N x c_out
+
+        y = term1 + b
+        if(verbose): print("N-Avg (%s)" %(name), node.shape, "->", y.shape)
+        return self.activation(x=y, activation=activation, name=name)
+
+    def pipgcn_node_edge_average(self, node, edge, hood, c_out, \
         batch_norm=False, activation=None, name='', verbose=True):
 
         node_in, c_out = node.get_shape().as_list()[-1], int(c_out)
@@ -319,6 +336,44 @@ class Layers(object):
 
         y = term1 + term2 + b
         if(verbose): print("N-E-Avg (%s)" %(name), node.shape, "->", y.shape)
+        return self.activation(x=y, activation=activation, name=name)
+
+    def pipgcn_order_dependent(self, node, edge, hood, c_out, \
+        batch_norm=False, activation=None, name='', verbose=True):
+
+        node_in, c_out = node.get_shape().as_list()[-1], int(c_out)
+        edge_in_o = edge.get_shape().as_list()[-2]
+        edge_in_f = edge.get_shape().as_list()[-1]
+        hood = tf.squeeze(hood, axis=2)
+        hood_in = tf.expand_dims(tf.math.count_nonzero(hood + 1, axis=1, dtype=tf.float32), -1)
+
+        w_node_c = self.__get_variable(shape=[node_in, c_out], \
+            trainable=True, name='%s_w_node_c' %(name))
+        w_node_n = self.__get_variable(shape=[node_in, c_out], \
+            trainable=True, name='%s_w_node_n' %(name))
+        w_edge_order = self.__get_variable(shape=[edge_in_o, c_out], \
+            trainable=True, name='%s_w_edge_o' %(name))
+        w_edge_feat = self.__get_variable(shape=[edge_in_f, c_out], \
+            trainable=True, name='%s_w_edge_f' %(name))
+        b = self.__get_variable(shape=[c_out], \
+            trainable=True, name='%s_b' %(name))
+
+        """ -=-=-= Term 1: node aggregation =-=-=- """
+        term1 = tf.linalg.matmul(node, w_node_c, name='%s_term1' %(name)) # N x c_out
+
+        """ -=-=-= Term 2: edge aggregation =-=-=- """
+        wn = tf.linalg.matmul(node, w_node_n, name='%s_term2_wn' %(name)) # N x c_out
+        we_o = tf.linalg.matmul(tf.transpose(edge, perm=[0, 2, 1]), w_edge_order, name='%s_term2_we_o' %(name))  # N x num_edge x c_out
+        we_f = tf.linalg.matmul(edge, w_edge_feat, name='%s_term2_we_f' %(name))  # N x num_edge x c_out
+        gather_n = tf.gather(wn, hood)
+        node_avg = tf.reduce_sum(gather_n, 1)
+        edge_order = tf.reduce_sum(we_o, 1) + tf.reduce_sum(we_f, 1)
+        numerator = node_avg + edge_order
+        denominator = tf.maximum(hood_in, tf.ones_like(hood_in))
+        term2 = tf.math.divide(numerator, denominator)  # (n_verts, v_filters)
+
+        y = term1 + term2 + b
+        if(verbose): print("Order-N-E-Avg (%s)" %(name), node.shape, "->", y.shape)
         return self.activation(x=y, activation=activation, name=name)
 
     def merge_ligand_receptor(self, ligand, receptor, pair, verbose=True):
