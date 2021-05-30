@@ -30,7 +30,8 @@ class Neuralnet(tf.Module):
         for idx, _ in enumerate(self.filters[:-1]):
             if(idx == 0): continue
             x = self.layer.conv2d(x=x, stride=1, \
-                filter_size=[3, 3, self.filters[idx-1], self.filters[idx]], activation='relu', name='%s-%dconv' %(name, idx), verbose=verbose)
+                filter_size=[3, 3, self.filters[idx-1], self.filters[idx]], \
+                activation='relu', name='%s-%dconv' %(name, idx), verbose=verbose)
             x = self.layer.maxpool(x=x, ksize=2, strides=2, \
                 name='%s-%dmp' %(name, idx), verbose=verbose)
 
