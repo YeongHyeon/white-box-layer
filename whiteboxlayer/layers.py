@@ -10,28 +10,27 @@ class Layers(object):
 
     """ -*-*-*-*-*- Variables -*-*-*-*-*- """
 
-    def get_variable(self, shape, constant=None, trainable=True, name=''):
+    def get_variable(self, shape=None, constant=None, trainable=True, name=''):
 
         try: return self.parameters[name]
         except:
             if(constant is None):
                 w = tf.Variable(
                     initial_value=self.initializer_xavier(shape),
+                    shape=shape,
                     trainable=trainable,
                     dtype=tf.float32,
                     name="%s_w" %(name)
                 )
             else:
-                w = tf.constant(
-                    value=constant,
-                    shape=shape,
-                    dtype=tf.float32,
-                    name="%s_w" %(name)
-                )
+                w = tf.Variable(
+                    initial_value=constant,
+                    name="%s_w" %(name),
+                    trainable=True,
+                    dtype=tf.float32)
 
             tmp_num = 1
-            for num in shape:
-                tmp_num *= num
+            for num in shape: tmp_num *= num
             self.num_params += tmp_num
             self.parameters[name] = w
 
@@ -57,16 +56,29 @@ class Layers(object):
 
     def batch_normalization(self, x, trainable=True, name='', verbose=True):
 
-        x_mean, x_var = tf.nn.moments(x, keepdims=False)
+        # https://arxiv.org/pdf/1502.03167.pdf
+
+        mean = tf.reduce_mean(x)
+        std = tf.math.reduce_std(x)
+        var = std**2
+
+        c_in = x.get_shape().as_list()[-1]
+        offset = self.get_variable(shape=[c_in], constant=0, \
+            trainable=trainable, name="%s_ofs" %(name))
+        scale = self.get_variable(shape=[c_in], constant=1, \
+            trainable=trainable, name="%s_sce" %(name))
 
         y = tf.nn.batch_normalization(
             x=x,
-            mean=x_mean,
-            variance=x_var,
+            mean=mean,
+            variance=var,
+            offset=offset,
+            scale=scale,
+            variance_epsilon=1e-12,
             name=name
         )
 
-        if(verbose): print("BN (%s)" %(name), x.shape, ">", y.shape)
+        if(verbose): print("BN (%s)" %(name), x.shape, "->", y.shape)
         return y
 
     def maxpool(self, x, ksize=2, strides=1, \

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name                = 'whiteboxlayer',
-    version             = '0.1.4',
+    version             = '0.1.5',
     description         = 'TensorFlow based custom layers',
     author              = 'YeongHyeon Park',
     author_email        = 'young200405@gmail.com',
