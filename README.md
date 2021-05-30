@@ -1,7 +1,7 @@
 <div align="center">
-  <p>
+  <a href="https://pypi.org/project/whiteboxlayer/"><p>
     <img src="misc/wblayer-logo.png" width="270">
-  </p>
+  </p></a>
 </div>  
 
 ---
