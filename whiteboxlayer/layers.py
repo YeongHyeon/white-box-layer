@@ -91,7 +91,7 @@ class Layers(object):
                 name=name
             )
 
-        if(verbose): print("MaxPool (%s)" %(name), x.shape, ">", y.shape)
+        if(verbose): print("MaxPool (%s)" %(name), x.shape, "->", y.shape)
         return y
 
     def conv1d(self, x, stride, \
