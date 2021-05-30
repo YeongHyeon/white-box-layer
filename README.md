@@ -3,7 +3,8 @@
     <img src="misc/wblayer-logo.png" width="270">
   </p>
 </div>  
-------------
+
+---
 
 ## Installation
 ```
