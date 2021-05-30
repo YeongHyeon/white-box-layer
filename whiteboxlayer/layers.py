@@ -82,7 +82,7 @@ class Layers(object):
                 data_format='NWC',
                 name=name
             )
-        elif(len(x.shape) == 3):
+        elif(len(x.shape) == 4):
             y = tf.nn.max_pool2d(
                 input=x,
                 ksize=ksize,
