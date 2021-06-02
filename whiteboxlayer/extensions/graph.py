@@ -16,7 +16,6 @@ def graph_conv(layer, x, a, c_out, \
     y = tf.linalg.matmul(a, y_feat)
 
     if(verbose): print("G-Conv (%s)" %(name), x.shape, "->", y.shape)
-
     if(batch_norm): y = layer.batch_normalization(x=y, \
         trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
@@ -30,6 +29,8 @@ def graph_attention(layer, x, c_out, \
     y = tf.math.reduce_sum(wx, axis=-1)
 
     if(verbose): print("Readout (%s)" %(name), x.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
 def read_out(layer, x, c_out, \
@@ -41,6 +42,8 @@ def read_out(layer, x, c_out, \
     y = tf.math.reduce_sum(wx, axis=-1)
 
     if(verbose): print("Readout (%s)" %(name), x.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
 def pipgcn_node_average(layer, node, c_out, \
@@ -58,6 +61,8 @@ def pipgcn_node_average(layer, node, c_out, \
 
     y = term1 + b
     if(verbose): print("N-Avg (%s)" %(name), node.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
 def pipgcn_node_edge_average(layer, node, edge, hood, c_out, \
@@ -92,6 +97,8 @@ def pipgcn_node_edge_average(layer, node, edge, hood, c_out, \
 
     y = term1 + term2 + b
     if(verbose): print("N-E-Avg (%s)" %(name), node.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
 def pipgcn_order_dependent(layer, node, edge, hood, c_out, \
@@ -130,6 +137,8 @@ def pipgcn_order_dependent(layer, node, edge, hood, c_out, \
 
     y = term1 + term2 + b
     if(verbose): print("Order-N-E-Avg (%s)" %(name), node.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
 def merge_ligand_receptor(layer, ligand, receptor, pair, verbose=True):
@@ -139,4 +148,6 @@ def merge_ligand_receptor(layer, ligand, receptor, pair, verbose=True):
 
     y = tf.concat([side_lgnd, side_rcpt], axis=1)
     if(verbose): print("Merge", ligand.shape, receptor.shape, "->", y.shape)
+    if(batch_norm): y = layer.batch_normalization(x=y, \
+        trainable=True, name='%s_bn' %(name), verbose=verbose)
     return y
