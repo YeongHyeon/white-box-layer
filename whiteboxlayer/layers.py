@@ -20,12 +20,12 @@ class Layers(object):
                     shape=shape,
                     trainable=trainable,
                     dtype=tf.float32,
-                    name="%s_w" %(name)
+                    name="%s" %(name)
                 )
             else:
                 w = tf.Variable(
                     initial_value=constant,
-                    name="%s_w" %(name),
+                    name="%s" %(name),
                     trainable=True,
                     dtype=tf.float32)
 
@@ -57,10 +57,7 @@ class Layers(object):
     def batch_normalization(self, x, trainable=True, name='', verbose=True):
 
         # https://arxiv.org/pdf/1502.03167.pdf
-
-        mean = tf.reduce_mean(x)
-        std = tf.math.reduce_std(x)
-        var = std**2
+        mean, variance = tf.nn.moments(x=x, axes=[0], keepdims=True, name="%s_mmt" %(name))
 
         c_in = x.get_shape().as_list()[-1]
         offset = self.get_variable(shape=[c_in], constant=0, \
@@ -71,7 +68,7 @@ class Layers(object):
         y = tf.nn.batch_normalization(
             x=x,
             mean=mean,
-            variance=var,
+            variance=variance,
             offset=offset,
             scale=scale,
             variance_epsilon=1e-12,
