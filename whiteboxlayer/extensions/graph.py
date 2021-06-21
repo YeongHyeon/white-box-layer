@@ -20,18 +20,22 @@ def graph_conv(layer, x, a, c_out, \
         trainable=True, name='%s_bn' %(name), verbose=verbose)
     return layer.activation(x=y, activation=activation, name=name)
 
-def graph_attention(layer, x, c_out, \
-    batch_norm=False, activation=None, name='', verbose=True):
+def graph_attention(layer, x, a, name='', verbose=True):
 
-    wx = layer.fully_connected(x=x, c_out=c_out, \
-        batch_norm=False, activation=None, name=name, verbose=False)
+    num_node, c_in = x.get_shape().as_list()[-2], x.get_shape().as_list()[-1]
+    w = layer.get_variable(shape=[c_in, c_in], \
+        trainable=True, name='%s_w' %(name))
 
-    y = tf.math.reduce_sum(wx, axis=-1)
+    wx = tf.linalg.matmul(x, w, name='%s_mul' %(name))
+    wxi = tf.repeat(wx, repeats=x.shape[1], axis=1)
+    wxj = tf.tile(wx, multiples=[1, x.shape[1], 1])
 
-    if(verbose): print("Readout (%s)" %(name), x.shape, "->", y.shape)
-    if(batch_norm): y = layer.batch_normalization(x=y, \
-        trainable=True, name='%s_bn' %(name), verbose=verbose)
-    return layer.activation(x=y, activation=activation, name=name)
+    eij = tf.reshape(tf.concat([wxi, wxj], axis=1), (-1, num_node, num_node, 2*c_in))
+    avg_k = tf.reduce_mean(eij, axis=-1)
+    y = tf.nn.softmax(avg_k, axis=-1)
+
+    if(verbose): print("G-attn (%s)" %(name), x.shape, a.shape, "->", y.shape)
+    return y
 
 def read_out(layer, x, c_out, \
     batch_norm=False, activation=None, name='', verbose=True):
