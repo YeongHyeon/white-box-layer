@@ -39,19 +39,20 @@ class Layers(object):
     """ -*-*-*-*-*- Classic Functions -*-*-*-*-*- """
     def activation(self, x, activation=None, name=''):
 
+        name = "%s_act" %(name)
         if(activation is None): return x
         elif("sigmoid" == activation):
-            return tf.nn.sigmoid(x, name='%s_sigmoid' %(name))
+            return tf.nn.sigmoid(x, name='%s' %(name))
         elif("tanh" == activation):
-            return tf.nn.tanh(x, name='%s_tanh' %(name))
+            return tf.nn.tanh(x, name='%s' %(name))
         elif("relu" == activation):
-            return tf.nn.relu(x, name='%s_relu' %(name))
+            return tf.nn.relu(x, name='%s' %(name))
         elif("lrelu" == activation):
-            return tf.nn.leaky_relu(x, name='%s_lrelu' %(name))
+            return tf.nn.leaky_relu(x, name='%s' %(name))
         elif("elu" == activation):
-            return tf.nn.elu(x, name='%s_elu' %(name))
+            return tf.nn.elu(x, name='%s' %(name))
         elif("swish" == activation):
-            return tf.nn.swish(x, name='%s_swish' %(name))
+            return tf.nn.swish(x, name='%s' %(name))
         else: return x
 
     def batch_normalization(self, x, trainable=True, name='', verbose=True):
@@ -119,7 +120,7 @@ class Layers(object):
             padding=padding,
             data_format='NWC',
             dilations=None,
-            name='%s_conv' %(name)
+            name='%s_cv' %(name)
         )
 
         y = tf.math.add(wx, b, name='%s_add' %(name))
@@ -146,7 +147,7 @@ class Layers(object):
             padding=padding,
             data_format='NWC',
             dilations=dilations,
-            name='%s_conv_tr' %(name)
+            name='%s_cvt' %(name)
         )
 
         y = tf.math.add(wx, b, name='%s_add' %(name))
@@ -172,7 +173,7 @@ class Layers(object):
             padding=padding,
             data_format='NHWC',
             dilations=dilations,
-            name='%s_conv' %(name)
+            name='%s_cv' %(name)
         )
 
         y = tf.math.add(wx, b, name='%s_add' %(name))
@@ -199,7 +200,7 @@ class Layers(object):
             padding=padding,
             data_format='NHWC',
             dilations=dilations,
-            name='%s_conv_tr' %(name)
+            name='%s_cvt' %(name)
         )
 
         y = tf.math.add(wx, b, name='%s_add' %(name))
