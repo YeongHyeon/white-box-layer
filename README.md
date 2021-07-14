@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://pypi.org/project/whiteboxlayer/"><p>
+  <a href="https://raw.githubusercontent.com/Orbit-of-Mercury/white-box-layer/master/misc/wblayer-logo-withtext.png"><p>
     <img src="misc/wblayer-logo-withtext.png" width="450">
   </p></a>
 </div>  
@@ -32,8 +32,7 @@ We welcome new contributors of all experience levels. The white-box-layer commun
 
 ### Example for Convolutional Neural Network
 An example of constructing a convolutional neural network is covered. The relevant source code is additionally provided following links.  
-* <a href="https://github.com/YeongHyeon/white-box-layer/blob/master/examples/example_cnn.py">Python script</a>  
-* <a href="https://github.com/YeongHyeon/white-box-layer/blob/master/examples/example_cnn.ipynb">Jupyter notebook</a>  
+* <a href="https://github.com/Orbit-of-Mercury/white-box-layer/blob/master/examples/example_cnn.ipynb">Jupyter notebook</a>  
 
 #### Define TensorFlow based module
 ``` python
