@@ -100,7 +100,7 @@ def save_params(model, optimizer, name='base', path_ckpt='.', tflite=False):
         ckptman = tf.train.CheckpointManager(ckpt, directory=os.path.join(path_ckpt, 'model_%s' %(name)), max_to_keep=1)
         ckptman.save()
 
-def load_params(model, name='base', path_ckpt='.'):
+def load_params(model, optimizer, name='base', path_ckpt='.'):
 
     vars_to_load = model.layer.parameters.copy()
     vars_to_load["optimizer"] = optimizer
@@ -110,4 +110,4 @@ def load_params(model, name='base', path_ckpt='.'):
     status = ckpt.restore(latest_ckpt)
     status.expect_partial()
 
-    return model
+    return model, optimizer
