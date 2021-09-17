@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://raw.githubusercontent.com/Orbit-of-Mercury/white-box-layer/master/misc/wblayer-logo-withtext.png"><p>
+  <a href="https://github.com/YeongHyeon/white-box-layer/blob/master/misc/wblayer-logo-withtext.png?raw=true"><p>
     <img src="misc/wblayer-logo-withtext.png" width="450">
   </p></a>
 </div>  
