@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.framework.convert_to_constants import convert_variables_to_constants_v2_as_graph
 
 def trim_odd(x):
 
@@ -54,5 +56,58 @@ def set_allweight(model, new_weight):
         tmp_constant = model.layer.parameters[name_pkey].numpy() * 0
         model.layer.parameters[name_pkey].assign(new_weight[idx_numparam:idx_numparam+tmp_numparam].reshape(tmp_shape))
         idx_numparam += tmp_numparam
+
+    return model
+
+def get_flops(conc_func, path_out='flops.txt'):
+
+    frozen_func, graph_def = convert_variables_to_constants_v2_as_graph(conc_func)
+
+    with tf.Graph().as_default() as graph:
+        tf.compat.v1.graph_util.import_graph_def(graph_def, name='')
+
+        run_meta = tf.compat.v1.RunMetadata()
+        opts = tf.compat.v1.profiler.ProfileOptionBuilder.float_operation()
+        flops = tf.compat.v1.profiler.profile(graph=graph, run_meta=run_meta, cmd="op", options=opts)
+
+        flop_tot = flops.total_float_ops
+        ftxt = open(path_out, "w")
+        for idx, name in enumerate(['', 'K', 'M', 'G', 'T']):
+            text = '%.3f [%sFLOPS]' %(flop_tot/10**(3*idx), name)
+            print(text)
+            ftxt.write("%s\n" %(text))
+        ftxt.close()
+
+def save_params(model, optimizer, name='base', path_ckpt='.', tflite=False):
+
+    if(tflite):
+        # https://github.com/tensorflow/tensorflow/issues/42818
+        converter = tf.lite.TFLiteConverter.from_concrete_functions([conc_func])
+
+        converter.optimizations = [tf.lite.Optimize.DEFAULT]
+        converter.experimental_new_converter = True
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS, tf.lite.OpsSet.SELECT_TF_OPS]
+
+        tflite_model = converter.convert()
+
+        with open('model_%s.tflite' %(name), 'wb') as f:
+            f.write(tflite_model)
+    else:
+        vars_to_save = model.layer.parameters.copy()
+        vars_to_save["optimizer"] = optimizer
+
+        ckpt = tf.train.Checkpoint(**vars_to_save)
+        ckptman = tf.train.CheckpointManager(ckpt, directory=os.path.join(path_ckpt, 'model_%s' %(name)), max_to_keep=1)
+        ckptman.save()
+
+def load_params(model, name='base', path_ckpt='.'):
+
+    vars_to_load = model.layer.parameters.copy()
+    vars_to_load["optimizer"] = optimizer
+
+    ckpt = tf.train.Checkpoint(**vars_to_load)
+    latest_ckpt = tf.train.latest_checkpoint(os.path.join(path_ckpt, 'model_%s' %(name)))
+    status = ckpt.restore(latest_ckpt)
+    status.expect_partial()
 
     return model
