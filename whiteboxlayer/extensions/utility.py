@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 
 def trim_odd(x):
@@ -29,3 +30,29 @@ def attention(x):
     y = tf.reshape(tf.nn.softmax(xr, axis=1), list_shape)
 
     return y
+
+def get_allweight(model):
+
+    list_pkey = list(model.layer.parameters.keys())
+    w_stack = []
+    for idx_pkey, name_pkey in enumerate(list_pkey):
+        w_stack.append(model.layer.parameters[name_pkey].numpy().flatten())
+
+    return np.hstack(w_stack) # as vector
+
+def set_allweight(model, new_weight):
+
+    list_pkey = list(model.layer.parameters.keys())
+    idx_numparam = 0
+    for idx_pkey, name_pkey in enumerate(list_pkey):
+        tmp_shape = list(model.layer.parameters[name_pkey].shape)
+
+        tmp_numparam = 1
+        for val_shape in tmp_shape:
+            tmp_numparam *= val_shape
+
+        tmp_constant = model.layer.parameters[name_pkey].numpy() * 0
+        model.layer.parameters[name_pkey].assign(new_weight[idx_numparam:idx_numparam+tmp_numparam].reshape(tmp_shape))
+        idx_numparam += tmp_numparam
+
+    return model
