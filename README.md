@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/YeongHyeon/white-box-layer/blob/master/misc/wblayer-logo-withtext.png?raw=true"><p>
-    <img src="misc/wblayer-logo-withtext.png" width="450">
+    <img src="misc/wblayer-logo.png" width="450">
   </p></a>
 </div>  
 
