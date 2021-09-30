@@ -106,11 +106,11 @@ class Layers(object):
 
     def conv1d(self, x, stride, \
         filter_size=[3, 16, 32], dilations=[1, 1, 1], \
-        padding='SAME', batch_norm=False, trainable=True, activation=None, name='', verbose=True):
+        padding='SAME', batch_norm=False, trainable=True, activation=None, usebias=True, name='', verbose=True):
 
         w = self.get_variable(shape=filter_size, \
             trainable=trainable, name='%s_w' %(name))
-        b = self.get_variable(shape=[filter_size[-1]], \
+        if(usebias): b = self.get_variable(shape=[filter_size[-1]], \
             trainable=trainable, name='%s_b' %(name))
 
         wx = tf.nn.conv1d(
@@ -123,7 +123,8 @@ class Layers(object):
             name='%s_cv' %(name)
         )
 
-        y = tf.math.add(wx, b, name='%s_add' %(name))
+        if(usebias): y = tf.math.add(wx, b, name='%s_add' %(name))
+        else: y = wx
         if(verbose): print("Conv (%s)" %(name), x.shape, "->", y.shape)
 
         if(batch_norm): y = self.batch_normalization(x=y, \
@@ -132,11 +133,11 @@ class Layers(object):
 
     def convt1d(self, x, stride, output_shape, \
         filter_size=[3, 16, 32], dilations=[1, 1, 1], \
-        padding='SAME', batch_norm=False, trainable=True, activation=None, name='', verbose=True):
+        padding='SAME', batch_norm=False, trainable=True, activation=None, usebias=True, name='', verbose=True):
 
         w = self.get_variable(shape=filter_size, \
             trainable=trainable, name='%s_w' %(name))
-        b = self.get_variable(shape=[filter_size[-2]], \
+        if(usebias): b = self.get_variable(shape=[filter_size[-2]], \
             trainable=trainable, name='%s_b' %(name))
 
         wx = tf.nn.conv1d_transpose(
@@ -150,7 +151,8 @@ class Layers(object):
             name='%s_cvt' %(name)
         )
 
-        y = tf.math.add(wx, b, name='%s_add' %(name))
+        if(usebias): y = tf.math.add(wx, b, name='%s_add' %(name))
+        else: y = wx
         if(verbose): print("ConvT (%s)" %(name), x.shape, "->", y.shape)
 
         if(batch_norm): y = self.batch_normalization(x=y, \
@@ -159,11 +161,11 @@ class Layers(object):
 
     def conv2d(self, x, stride, \
         filter_size=[3, 3, 16, 32], dilations=[1, 1, 1, 1], \
-        padding='SAME', batch_norm=False, trainable=True, activation=None, name='', verbose=True):
+        padding='SAME', batch_norm=False, trainable=True, activation=None, usebias=True, name='', verbose=True):
 
         w = self.get_variable(shape=filter_size, \
             trainable=trainable, name='%s_w' %(name))
-        b = self.get_variable(shape=[filter_size[-1]], \
+        if(usebias): b = self.get_variable(shape=[filter_size[-1]], \
             trainable=trainable, name='%s_b' %(name))
 
         wx = tf.nn.conv2d(
@@ -176,7 +178,8 @@ class Layers(object):
             name='%s_cv' %(name)
         )
 
-        y = tf.math.add(wx, b, name='%s_add' %(name))
+        if(usebias): y = tf.math.add(wx, b, name='%s_add' %(name))
+        else: y = wx
         if(verbose): print("Conv (%s)" %(name), x.shape, "->", y.shape)
 
         if(batch_norm): y = self.batch_normalization(x=y, \
@@ -185,11 +188,11 @@ class Layers(object):
 
     def convt2d(self, x, stride, output_shape, \
         filter_size=[3, 3, 16, 32], dilations=[1, 1, 1, 1], \
-        padding='SAME', batch_norm=False, trainable=True, activation=None, name='', verbose=True):
+        padding='SAME', batch_norm=False, trainable=True, activation=None, usebias=True, name='', verbose=True):
 
         w = self.get_variable(shape=filter_size, \
             trainable=trainable, name='%s_w' %(name))
-        b = self.get_variable(shape=[filter_size[-2]], \
+        if(usebias): b = self.get_variable(shape=[filter_size[-2]], \
             trainable=trainable, name='%s_b' %(name))
 
         wx = tf.nn.conv2d_transpose(
@@ -203,7 +206,8 @@ class Layers(object):
             name='%s_cvt' %(name)
         )
 
-        y = tf.math.add(wx, b, name='%s_add' %(name))
+        if(usebias): y = tf.math.add(wx, b, name='%s_add' %(name))
+        else: y = wx
         if(verbose): print("ConvT (%s)" %(name), x.shape, "->", y.shape)
 
         if(batch_norm): y = self.batch_normalization(x=y, \
@@ -211,17 +215,18 @@ class Layers(object):
         return self.activation(x=y, activation=activation, name=name)
 
     def fully_connected(self, x, c_out, \
-        batch_norm=False, trainable=True, activation=None, name='', verbose=True):
+        batch_norm=False, trainable=True, activation=None, usebias=True, name='', verbose=True):
 
         c_in, c_out = x.get_shape().as_list()[-1], int(c_out)
 
         w = self.get_variable(shape=[c_in, c_out], \
             trainable=trainable, name='%s_w' %(name))
-        b = self.get_variable(shape=[c_out], \
+        if(usebias): b = self.get_variable(shape=[c_out], \
             trainable=trainable, name='%s_b' %(name))
 
         wx = tf.linalg.matmul(x, w, name='%s_mul' %(name))
-        y = tf.math.add(wx, b, name='%s_add' %(name))
+        if(usebias): y = tf.math.add(wx, b, name='%s_add' %(name))
+        else: y = wx
         if(verbose): print("FC (%s)" %(name), x.shape, "->", y.shape)
 
         if(batch_norm): y = self.batch_normalization(x=y, \
