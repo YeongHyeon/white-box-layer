@@ -15,9 +15,9 @@ Contribute now!
 
 ### Dependencies
 whiteboxlayer requires:
-* Numpy: 1.18.5  
+* Numpy: 1.19.5  
 * Scipy: 1.4.1  
-* TensorFlow: 2.3.0  
+* TensorFlow: 2.4.0  
 
 ### User installation
 You can install the white-box-layer via simple command as below.  
