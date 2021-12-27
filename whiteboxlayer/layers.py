@@ -55,6 +55,12 @@ class Layers(object):
             return tf.nn.swish(x, name='%s' %(name))
         else: return x
 
+    def dropout(self, x, rate=0.5, name=''):
+
+        y = tf.nn.dropout(x=x, rate=rate, name=name)
+
+        return y
+
     def batch_normalization(self, x, trainable=True, name='', verbose=True):
 
         # https://arxiv.org/pdf/1502.03167.pdf
@@ -77,6 +83,40 @@ class Layers(object):
         )
 
         if(verbose): print("BN (%s)" %(name), x.shape, "->", y.shape)
+        return y
+
+    def layer_normalization(self, x, trainable=True, name='', verbose=True):
+
+        len_xdim = len(x.shape)
+        if(len_xdim == 2): x = tf.transpose(x, [1, 0])
+        elif(len_xdim == 3): x = tf.transpose(x, [2, 1, 0])
+        elif(len_xdim == 4): x = tf.transpose(x, [3, 1, 2, 0])
+        elif(len_xdim == 5): x = tf.transpose(x, [4, 1, 2, 3, 0])
+
+        mean, variance = tf.nn.moments(x=x, axes=[0], keepdims=True, name="%s_mmt" %(name))
+
+        c_in = x.get_shape().as_list()[-1]
+        offset = self.get_variable(shape=[c_in], constant=0, \
+            trainable=trainable, name="%s_ofs" %(name))
+        scale = self.get_variable(shape=[c_in], constant=1, \
+            trainable=trainable, name="%s_sce" %(name))
+
+        y = tf.nn.batch_normalization(
+            x=x,
+            mean=mean,
+            variance=variance,
+            offset=offset,
+            scale=scale,
+            variance_epsilon=1e-12,
+            name=name
+        )
+
+        if(len_xdim == 2): y = tf.transpose(y, [1, 0])
+        elif(len_xdim == 3): y = tf.transpose(y, [2, 1, 0])
+        elif(len_xdim == 4): y = tf.transpose(y, [3, 1, 2, 0])
+        elif(len_xdim == 5): y = tf.transpose(y, [4, 1, 2, 3, 0])
+
+        if(verbose): print("LN (%s)" %(name), x.shape, "->", y.shape)
         return y
 
     def maxpool(self, x, ksize=2, strides=1, \
