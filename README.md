@@ -32,7 +32,7 @@ We welcome new contributors of all experience levels. The white-box-layer commun
 
 ### Example for Convolutional Neural Network
 An example of constructing a convolutional neural network is covered. The relevant source code is additionally provided following links.  
-* <a href="https://github.com/Orbit-of-Mercury/white-box-layer/blob/master/examples/example_cnn.ipynb">Jupyter notebook</a>  
+* <a href="https://github.com/yeonghyeon/white-box-layer/blob/master/examples/example_cnn.ipynb">Jupyter notebook</a>  
 
 #### Define TensorFlow based module
 ``` python
