@@ -110,7 +110,7 @@ def gru_cell(layer, x_now, h_prev, output_dim, \
     y_now = layer.fully_connected(x=h_now, c_out=output_dim, \
         batch_norm=False, activation=activation, name="%s-y" %(name), verbose=verbose)
 
-    if(verbose): print("LSTM Cell (%s)" %(name), x_now.shape, "->", y_now.shape)
+    if(verbose): print("GRU Cell (%s)" %(name), x_now.shape, "->", y_now.shape)
     return h_now, y_now
 
 def gru_layer(layer, x, output_dim, \
