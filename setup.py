@@ -6,7 +6,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name                = 'whiteboxlayer',
-    version             = '0.2.3',
+    version             = '0.2.4',
     description         = 'TensorFlow based custom layers',
     author              = 'YeongHyeon Park',
     author_email        = 'young200405@gmail.com',
