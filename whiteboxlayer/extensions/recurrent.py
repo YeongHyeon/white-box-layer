@@ -45,14 +45,14 @@ def lstm_cell(layer, x_now, h_prev, c_prev, output_dim, \
     c_now_act = layer.activation(x=c_now, activation=activation, name="%s-c-act" %(name))
     h_now = tf.compat.v1.multiply(o_now, c_now_act, name="%s-h" %(name))
 
-    return h_now, c_now, y_now
+    return h_now, c_now
 
 def lstm_layer(layer, x, output_dim, \
     batch_norm=False, activation="tanh", recurrent_activation="sigmoid", bi_direction=False, name='lstm', verbose=True):
 
     x = tf.transpose(x, perm=[1, 0, 2])
     dim_seq = x.get_shape().as_list()[0]
-    y, y_rev, h_now = None, None, None
+    y, y_rev, h_now, c_now = None, None, None, None
     for idx_s in range(dim_seq):
 
         h_now, c_now = lstm_cell(layer=layer, \
