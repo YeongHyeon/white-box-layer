@@ -51,8 +51,6 @@ class Layers(object):
             return tf.nn.leaky_relu(x, name='%s' %(name))
         elif("elu" == activation):
             return tf.nn.elu(x, name='%s' %(name))
-        elif("swish" == activation):
-            return tf.nn.swish(x, name='%s' %(name))
         else: return x
 
     def dropout(self, x, rate=0.5, name=''):
